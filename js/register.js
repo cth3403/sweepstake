@@ -1,6 +1,6 @@
 // allow players to register their name and email based on signup codes they were sent 
 
-var drawn = [], auth_key, auth, set_auth, json, player; 
+var drawn = [], auth_key, auth, set_auth, json, player, value =[]; 
 
 function Player(name,email){
   this.name = name;
@@ -32,12 +32,13 @@ function mkPlayer(value){
         }); 
  });
 
-// sen a sonfirmation email to the user that they have registered
+// send a sonfirmation email to the user that they have registered
 function confU(email){
   console.log(email);
  }
 
 function postPHP(data){
+  console.log(data);
   $.ajax({
     type: "GET",
     dataType : 'json',
@@ -66,7 +67,6 @@ $('#submit').click(function(){
     }
 
   if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
-   var value =[];
    value.name = $( "#signup_name" ).val();
    value.email = $( "#signup_email" ).val();
    mkPlayer(value);
@@ -78,11 +78,18 @@ $('#submit').click(function(){
     //names.push(player);
      console.log('defined auth' );
    }
-
-  console.log( "Not valid!" );
+   else{
+      console.log( "Not valid!" );
+    }
   //event.preventDefault();
 });
 
+// if enter key is pressed after auth_key has been inputted trigger the click function
+$('#auth_key').keypress(function(e) {
+  if(e.which == 13){
+    $('#submit').click();
+  }
+});
 
 
 // function to post javscript object to php file to save to data.json
