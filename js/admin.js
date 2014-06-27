@@ -1,6 +1,6 @@
 // allow players to register their name and email based on signup codes they were sent 
 
-var drawn = [], auth_key, auth, set_auth, json, player; 
+var drawn = [], auth_key, auth, set_auth, json, player, table_data = []; 
 
 
 // function to generate registration code
@@ -15,93 +15,24 @@ function makeid()
     return text;
 }
 
-function addEdit(line, id){
-  if(id === "players"){
-    $('#'+id).append('<tr><td><input type="text" value="'+json[0].players[line].name+'"></td><td><input type="text" value="'+json[0].players[line].email+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
-  }
-  if(id === "teams"){
-    $('#'+id).append('<tr><td><input type="text" value="'+json[0].teams[line].name+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
-  }
+// function to create table rows based on objects in arrays
+function popTable(id, array){
+    $('#'+id).empty();
+    if(id === "teams"){
+      $.each(array, function(key){
+        $('#'+id).append('<tr id="'+id+'_table_data_'+key+'"><td><input type="text" value="'+json[0].teams[key].name+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
+      });
+    }
+    if(id === "players"){
+      $.each(array, function(key){
+        $('#'+id).append('<tr id="'+id+'_table_data_'+key+'"><td><input type="text" value="'+json[0].players[key].name+'"></td><td><input type="text" value="'+json[0].players[key].email+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
+      });
+    }
 }
 
-$("button:first").click(function() {
-  json[0].signup.auth_key = makeid();
-  $('#code').text(json[0].signup.auth_key);
-});
-
-
-
-
-$('#add_team').click(function() {
-  /* Act on the event */
-});
-
-
-$.getJSON('data/data.json', function(data) {
-  json = data;
-  if(json[0].signup[0].auth_key != ""){
-    $('#code').text(json[0].signup.auth_key);
-  }
-
-  $.each(json[0].teams, function(key, value){
-    addEdit(key, "teams");
-  });
-
-  $.each(json[0].players, function(key, value){
-    addEdit(key, "players");
-  });
-
-});
-
-
-
-
-
-
-// function to add players/teams
-
-
-
-// function to edit players/teams
-
-/*
-
-function Player(name,email){
-  this.name = name;
-  this.email = email;
-}
-
-function Drawn(team, team_id){
-  this.team = team;
-  this.team_id = team_id;
-  this.name;
-  this.email;
-}
-
-function mkPlayer(value){
-  player = new Player(value.name, value.email);
-  //names.push(player);
-}
-// get the player and team JSON file and create separate objects
- $.getJSON('data/data.json', function(data) {
-        json = data;
-       // create the team object from the datafile
-        $.each(data[0].signup, function(key, value) {
-         auth = value.auth_key;
-        });
-
-        // create the player object from the datafile
-        $.each(data[0].players, function(key, value) {
-         // mkPlayer(value);
-        }); 
- });
-
-// sen a sonfirmation email to the user that they have registered
-function confU(email){
-  console.log(email);
- }
-
+// function to post data to the json file
 function postPHP(data){
+  console.log(data);
   $.ajax({
     type: "GET",
     dataType : 'json',
@@ -115,40 +46,47 @@ function postPHP(data){
   });
 }
 
-// checks whether the signup code is valid
-$('#submit').click(function(){
+// on page load get the json file, fire function calls and set click handlers 
+$.getJSON('data/data.json', function(data) {
+  json = data;
+  if(json[0].signup[0].auth_key != ""){
+    $('#code').text(json[0].signup.auth_key);
+  }
 
+  popTable('teams', json[0].teams);
+  popTable('players', json[0].players);
 
-    if ( $( "input:first" ).val() === auth) {
+  $('.glyphicon-plus:button').click(function() {
+    $(this).parents('tr').after('<tr><td><input type="text" value=""></td><td><input type="text" value=""></td></tr>');
+  });
 
-      $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
-      
-      set_auth = $( "input:first" ).val();
+  $('.glyphicon-minus:button').click(function() {
+    var array;
+    var data_id = $(this).parents('tbody').attr('id');
 
-      console.log(auth);
-      return;
+    if(data_id === 'teams'){
+      array = json[0].teams;
+    }
+    else if(data_id === 'players'){
+      array = json[0].players;
     }
 
-  if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
-   var value =[];
-   value.name = $( "#signup_name" ).val();
-   value.email = $( "#signup_email" ).val();
-   mkPlayer(value);
-   json[0].players.push(player);
-   postPHP(json);
-   confU(value.email);
-    
-   // var player = new Player($( "#signup_name" ).val(),$( "#signup_email" ).val()); 
-    //names.push(player);
-     console.log('defined auth' );
-   }
+    var index = $(this).parents('tr').attr('id');
+    index = index.toString().match(/\d+/);
+    array.splice(index[0],1);
+    $(this).parents('tr').remove();
+  });
 
-  console.log( "Not valid!" );
-  //event.preventDefault();
+  $("button:first").click(function() {
+    json[0].signup.auth_key = makeid();
+    $('#code').text(json[0].signup.auth_key);
+  });
+
 });
 
 
 
-// function to post javscript object to php file to save to data.json 
 
-*/
+
+
+
