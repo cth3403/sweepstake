@@ -7,8 +7,6 @@ function Player(name,email){
   this.email = email;
 }
 
-
-
 function mkPlayer(value){
   player = new Player(value.name, value.email);
   //names.push(player);
