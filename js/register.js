@@ -1,18 +1,13 @@
-// allow players to register their name and email based on signup codes they were sent 
+// allow players to register their name and email based on signup codes they were sent
 
-var drawn = [], auth_key, auth, set_auth, json, player, value =[]; 
+var auth_key, auth, set_auth, json, player, value =[];
 
 function Player(name,email){
   this.name = name;
   this.email = email;
 }
 
-function Drawn(team, team_id){
-  this.team = team;
-  this.team_id = team_id;
-  this.name;
-  this.email;
-}
+
 
 function mkPlayer(value){
   player = new Player(value.name, value.email);
@@ -29,7 +24,7 @@ function mkPlayer(value){
         // create the player object from the datafile
         $.each(data[0].players, function(key, value) {
          // mkPlayer(value);
-        }); 
+        });
  });
 
 // send a sonfirmation email to the user that they have registered
@@ -59,7 +54,7 @@ $('#submit').click(function(){
     if ( $( "input:first" ).val() === auth) {
 
       $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
-      
+
       set_auth = $( "input:first" ).val();
 
       console.log(auth);
@@ -73,8 +68,8 @@ $('#submit').click(function(){
    json[0].players.push(player);
    postPHP(json);
    confU(value.email);
-    
-   // var player = new Player($( "#signup_name" ).val(),$( "#signup_email" ).val()); 
+
+   // var player = new Player($( "#signup_name" ).val(),$( "#signup_email" ).val());
     //names.push(player);
      console.log('defined auth' );
    }
