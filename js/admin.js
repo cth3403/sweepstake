@@ -75,11 +75,12 @@ function postPHP(data){
   });
 }
 
+// for some reason the click events were firing twice and to stop this added an  unbind('click') to stop this
 function buttons(){
   var array, data_id, index, pos, obj;
 
   // get details about the button that has been clicked
-  $('.glyphicon:button').click(function(){
+  $('.glyphicon:button').unbind('click').click(function(){
     data_id = $(this).parents('tbody').attr('id');
 
     if(data_id === 'teams'){
@@ -118,23 +119,26 @@ function buttons(){
   });
 
   // call the makeid function to generate a key
-  $("button:first").click(function() {
+  $("button:first").unbind('click').click(function() {
     json[0].signup[0].auth_key = makeid();
     $('#code').text(json[0].signup[0].auth_key);
   });
 
   // function to update json and save changes
-  $('.save:button').click(function(){
-    var upd = $(this).attr('class');
+  $('.save:button').unbind('click').click(function(){
+    var array;
     var id;
-    if($(upd).hasClass('teams')){
+    if($(this).hasClass('teams')){
       id = 'teams';
+      array = json[0].teams;
     }
-    else if($(upd).hasClass('players')){
+    else if($(this).hasClass('players')){
       id = 'players';
+      array = json[0].players;
     }
     console.log(id);
-    //postPHP(json);
+    createJSON(id,array);
+    postPHP(json);
   });
 }
 
