@@ -38,24 +38,25 @@ function popTable(id, array){
       });
     }
     buttons();
+
 }
 
-// function to create JSON - id is the id holding the elements and  array is the array to update 
+// function to create JSON - id is the id holding the elements and  array is the array to update
 function createJSON(id,array){
-  $.each($('#'+id).attr('tr').children(), function(key, value){
+  console.log($('#'+id));
+  console.log($('#'+id+' tr').children());
+
+  $.each($('#'+id+' tr'), function(key, value){
    var email, name;
-   name = value.cells[0].innerHTML;
-   name = $(name+' input').val();
+   name = value.cells[0].firstChild;
    if(id === 'players'){
-    email = value.cells[1].innerHTML;
-    email = $(email+' input').val();
-    json[0].players[key].name = name;
-    json[0].players[key].email = email;
+    email = value.cells[1].firstChild;
+    json[0].players[key].name = name.value;
+    json[0].players[key].email = email.value;
    }
    else if(id === 'teams'){
-    json[0].teams[key].name = name;
+    json[0].teams[key].name = name.value;
    }
-   //alert(email);
  });
 }
 
