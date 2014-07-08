@@ -1,6 +1,6 @@
 // allow players to register their name and email based on signup codes they were sent
 
-var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[];
+var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[], jsonData = ['teams','players'];
 
 function Team(team_id, name){
   this.team_id = team_id;
@@ -151,8 +151,32 @@ $.getJSON('data/data.json', function(data) {
     $('#code').text(json[0].signup[0].auth_key);
   }
 
-  // TODO  -  change this so it loops through an array [teams => 'teams', players => 'players'] so it would be popTable(value, json[0].key)
-  popTable('teams', json[0].teams);
-  popTable('players', json[0].players);
+// run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
+$.each(jsonData, function(key,value){
+  popTable(value, json[0][jsonData[key]]);
+  if(json[0][jsonData[key]].length < 1){
+    var obj;
+    var array = json[0][jsonData[key]];
+    if(value === 'teams'){
+      obj = new Team("","");
+    }
+    else if(value === 'players'){
+      obj = new Player("","");
+    }
+    array.splice(0,1,obj);
+    popTable(value,json[0][jsonData[key]]);
+  }
+});
+
+/*  if(json[0].teams.length >= 1){
+    // TODO  -  change this so it loops through an array [teams => 'teams', players => 'players'] so it would be popTable(value, json[0].key)
+    popTable('teams', json[0].teams);
+  }
+  if(json[0].players.length >= 1){
+    popTable('players', json[0].players);
+  }
+  else{
+
+  }*/ 
 
 });
