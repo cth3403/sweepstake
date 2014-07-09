@@ -10,9 +10,33 @@ PHP Server
 Add some teams. Add an equal number of players. Click 'Random' to draw a team and a name.
 
 
-### Longer guide:
+### Longer guide:  
+**Register:**  
+<u>Auth code box</u>  
+Players wishing to register will need to enter the Invite Code this should match that in json[0].signup[0].auth_key.  
+  
+They can then enter their name and email, on saving this is added to the players array of the json data object.   
+
+**Draw:**  
+  
+<u>Randomize</u>  
+Click button to randomly draw teams and players.  
 
 
+**Admin:**  
+  
+<u>Generate Invite Code</u>  
+This function is used to generate a random code that you can send to people who wish to sign up to play.  
+  
+<u>Add/Edit Teams</u>  
+Add/Edit/Delete teams from the 'teams' array in the json object. If there aren't any pre-existing teams an empty line will be present for data to be added.  
+
+Save per change as the save function can't yet handle multiple add/edit/deletes.
+
+<u>Add/Edit Players</u>  
+Add/Edit/Delete players from the 'players' array in the json object. If there aren't any pre-existing players an empty line will be present for data to be added.
+
+Save per change as the save function can't yet handle multiple add/edit/deletes.
 
 ### Assets:
 Background image url: <a href="http://wallhamdu.com/wallpaper-world-cup-brazil-2014-hd.html">http://wallhamdu.com/wallpaper-world-cup-brazil-2014-hd.html</a>
