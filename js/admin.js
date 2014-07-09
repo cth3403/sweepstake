@@ -1,6 +1,6 @@
 // allow players to register their name and email based on signup codes they were sent
 
-var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[];
+var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[], jsonData = ['teams','players'];
 
 function Team(team_id, name){
   this.team_id = team_id;
@@ -43,20 +43,17 @@ function popTable(id, array){
 
 // function to create JSON - id is the id holding the elements and  array is the array to update
 function createJSON(id,array){
-  console.log($('#'+id));
-  console.log($('#'+id+' tr').children());
 
   $.each($('#'+id+' tr'), function(key, value){
-   var email, name;
-   name = value.cells[0].firstChild;
-   if(id === 'players'){
-    email = value.cells[1].firstChild;
-    json[0].players[key].name = name.value;
-    json[0].players[key].email = email.value;
+   var name = value.cells[0].firstChild;
+   var email = value.cells[1].firstChild;
+   var inArr = jsonData.indexOf(id);
+
+   if($(email).hasClass('email')){
+    json[0][jsonData[inArr]][key].email = email.value;
    }
-   else if(id === 'teams'){
-    json[0].teams[key].name = name.value;
-   }
+
+   json[0][jsonData[inArr]][key].name = name.value;
  });
 }
 
@@ -78,21 +75,28 @@ function postPHP(data){
 
 // for some reason the click events were firing twice and to stop this added an  unbind('click') to stop this
 function buttons(){
-  var array, data_id, index, pos, obj;
+  var array, data_id, index, pos, obj, inArr;
 
   // get details about the button that has been clicked
   $('.glyphicon:button').unbind('click').click(function(){
     data_id = $(this).parents('tbody').attr('id');
 
-    if(data_id === 'teams'){
-      array = json[0].teams;
+    // find position of the div id in the jsonData array
+    inArr = jsonData.indexOf(data_id);
 
-      // TODO - get the ID of the previous team and set it here
-      obj = new Team("","");
-    }
-    else if(data_id === 'players'){
-      array = json[0].players;
-      obj = new Player("","");
+    // set the array var to the right object
+    array = json[0][jsonData[inArr]];
+
+    // TODO -- need to get the next team_id and set it as part of the new Team  object
+
+    // set the obj var depending on the context
+    switch(jsonData[inArr]){
+      case 'teams':
+      obj = new Team("","")
+      break;
+      case 'players':
+      obj = new  Player("","")
+      break;
     }
 
     var index = $(this).parents('tr').attr('id');
@@ -102,13 +106,7 @@ function buttons(){
     if($(this).hasClass('glyphicon-plus')){
       var pos = parseInt(index[0],10)+1;
       array.splice(pos,0,obj);
-      if(data_id === 'teams'){
-        popTable(data_id, json[0].teams);
-      }
-      else if(data_id === 'players'){
-        popTable(data_id, json[0].players);
-      }
-
+      popTable(data_id, array);
     }
 
     // remove the  object from the array and  remove the row
@@ -127,19 +125,17 @@ function buttons(){
 
   // function to update json and save changes
   $('.save:button').unbind('click').click(function(){
-    var array;
-    var id;
-    if($(this).hasClass('teams')){
-      id = 'teams';
-      array = json[0].teams;
+    // text to ignore from the class of the save button
+    var str = "save btn btn-primary ";
+    var save = $(this).attr('class');
+    var rep = save.replace(str, "");
+    var inArr = jsonData.indexOf(rep);
+
+    if(inArr >= 0){
+      var array = json[0][jsonData[inArr]];
+      createJSON(rep,array);
+      postPHP(json);
     }
-    else if($(this).hasClass('players')){
-      id = 'players';
-      array = json[0].players;
-    }
-    console.log(id);
-    createJSON(id,array);
-    postPHP(json);
   });
 }
 
@@ -151,8 +147,24 @@ $.getJSON('data/data.json', function(data) {
     $('#code').text(json[0].signup[0].auth_key);
   }
 
-  // TODO  -  change this so it loops through an array [teams => 'teams', players => 'players'] so it would be popTable(value, json[0].key)
-  popTable('teams', json[0].teams);
-  popTable('players', json[0].players);
+// run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
+$.each(jsonData, function(key,value){
+  popTable(value, json[0][jsonData[key]]);
+
+  // if there is nothing in the array, create a blank input box
+  if(json[0][jsonData[key]].length < 1){
+    var obj;
+    var array = json[0][jsonData[key]];
+    if(value === 'teams'){
+      obj = new Team("","");
+    }
+    else if(value === 'players'){
+      obj = new Player("","");
+    }
+    array.splice(0,1,obj);
+    popTable(value,json[0][jsonData[key]]);
+  }
+});
+
 
 });
