@@ -20,8 +20,7 @@ function makeid()
 
     for( var i=0; i < 6; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
+    return CryptoJS.AES.encrypt(text, 'message');
 }
 
 // function to create table rows based on objects in arrays
@@ -119,8 +118,10 @@ function buttons(){
 
   // call the makeid function to generate a key
   $("button:first").unbind('click').click(function() {
-    json[0].signup[0].auth_key = makeid();
-    $('#code').text(json[0].signup[0].auth_key);
+    var encrypted = makeid();
+    var decrypted = CryptoJS.AES.decrypt(encrypted, 'message');
+    json[0].signup[0].auth_key = encrypted.toString();
+    $('#code').text(decrypted);
   });
 
   // function to update json and save changes
@@ -136,6 +137,9 @@ function buttons(){
       createJSON(rep,array);
       postPHP(json);
     }
+    else if(rep === 'gen'){
+      postPHP(json);
+    }
   });
 }
 
@@ -144,7 +148,8 @@ function buttons(){
 $.getJSON('data/data.json', function(data) {
   json = data;
   if(json[0].signup[0].auth_key !== ""){
-    $('#code').text(json[0].signup[0].auth_key);
+    var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, 'message');
+    $('#code').text(decrypted);
   }
 
 // run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
