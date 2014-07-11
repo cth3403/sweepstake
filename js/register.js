@@ -48,14 +48,14 @@ function postPHP(data){
 // checks whether the signup code is valid
 $('#submit').click(function(){
 
+var cipher = $("#auth_key").val();
+var msg = $("#auth_msg").val();
+var decrypted = CryptoJS.AES.decrypt(auth, msg);
+decrypted = decrypted.toString();
 
-    if ( $( "input:first" ).val() === auth) {
-
+    if (decrypted === cipher) {
       $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
-
       set_auth = $( "input:first" ).val();
-
-      console.log(auth);
       return;
     }
 
@@ -66,15 +66,11 @@ $('#submit').click(function(){
    json[0].players.push(player);
    postPHP(json);
    confU(value.email);
-
-   // var player = new Player($( "#signup_name" ).val(),$( "#signup_email" ).val());
-    //names.push(player);
-     console.log('defined auth' );
    }
    else{
+    $('#auth_submit').html('<div class="form-group has-error"><p class="help-block">The submitted code is not valid</p></div>');
       console.log( "Not valid!" );
     }
-  //event.preventDefault();
 });
 
 // if enter key is pressed after auth_key has been inputted trigger the click function
@@ -83,6 +79,3 @@ $('#auth_key').keypress(function(e) {
     $('#submit').click();
   }
 });
-
-
-// function to post javscript object to php file to save to data.json
