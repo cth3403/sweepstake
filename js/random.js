@@ -1,8 +1,8 @@
 var drawn = [], result, jsonData = ['teams','players'], json, xval, xitem, xhtml;
-var types = new Array();
-types['teams'] = new Array();
-types['players'] = new Array();
-types['drawn'] = new Array
+var types = [];
+types['teams'] = [];
+types['players'] = [];
+types['drawn'] = [];
 
 function Team(team_id, name){
   this.team_id = team_id;
@@ -49,7 +49,7 @@ function randomArray(r_array, htmlApp){
   // add the team info to the Drawn object
   if(htmlApp === 'teams'){
     result = new Drawn(item.name,item.team_id) ;
-    drawn.push(result);
+    types['drawn'].push(result);
   }
 
   // add the player info to the Drawn object
@@ -81,13 +81,13 @@ function randomArray(r_array, htmlApp){
     if(value === 'teams'){
       $.each(json[0][jsonData[key]], function(key, value) {
         obj = new Team(value.team_id, value.name);
-        array.push(obj)
+        array.push(obj);
       });
     }
     if(value === 'players'){
       $.each(json[0][jsonData[key]], function(key, value) {
         obj = new Player(value.name, value.email);
-        array.push(obj)
+        array.push(obj);
       });
     }
   });
@@ -103,8 +103,8 @@ $('#random').click(function(){
     randomArray(types[value], value);
   });
 
-  // do an auto draw by simulating a click event
-  if ($('#autoDraw').is(':checked') && types[0].length > 0){
+  // do an auto draw by simulating a click event. Since the players is the last to be drawmn, the length of this array is used to determine whether the click event is triggered.
+  if ($('#autoDraw').is(':checked') && types['players'].length >= 0){
     setTimeout(function(){
       $('#random').trigger('click');
     },2000);
