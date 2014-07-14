@@ -1,6 +1,6 @@
 // allow players to register their name and email based on signup codes they were sent
 
-var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[], jsonData = ['teams','players'];
+var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[], jsonData = ['teams','players'], message;
 
 function Team(team_id, name){
   this.team_id = team_id;
@@ -13,14 +13,14 @@ function Player(name,email){
 }
 
 // function to generate registration code
-function makeid()
+function makeid(message)
 {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for( var i=0; i < 6; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return CryptoJS.AES.encrypt(text, 'message');
+    return CryptoJS.AES.encrypt(text, message);
 }
 
 // function to create table rows based on objects in arrays
@@ -54,6 +54,20 @@ function createJSON(id,array){
 
    json[0][jsonData[inArr]][key].name = name.value;
  });
+}
+
+function secretMsg(message){
+  $.ajax({
+    type: "GET",
+    dataType: 'text',
+    async: false,
+    url: 'js/save_file.php',
+    data: {'msg': message},
+    success: function () {
+      $('#result').text('Secret message and password have been saved.');
+       },
+    failure: function() {alert("Error!");}
+  });
 }
 
 // function to post data to the json file
@@ -91,10 +105,10 @@ function buttons(){
     // set the obj var depending on the context
     switch(jsonData[inArr]){
       case 'teams':
-      obj = new Team("","")
+      obj = new Team("","");
       break;
       case 'players':
-      obj = new  Player("","")
+      obj = new  Player("","");
       break;
     }
 
@@ -118,10 +132,16 @@ function buttons(){
 
   // call the makeid function to generate a key
   $("button:first").unbind('click').click(function() {
-    var encrypted = makeid();
-    var decrypted = CryptoJS.AES.decrypt(encrypted, 'message');
+    message = $('#message').val();
+    if(message === undefined || message === ""){
+      $('#message_area').append('<div class="form-group has-error"><p class="help-block">You need to add a message before clicking generate</p></div>');
+    }
+    else{
+    var encrypted = makeid(message);
+    var decrypted = CryptoJS.AES.decrypt(encrypted, message);
     json[0].signup[0].auth_key = encrypted.toString();
     $('#code').text(decrypted);
+    }
   });
 
   // function to update json and save changes
@@ -135,22 +155,28 @@ function buttons(){
     if(inArr >= 0){
       var array = json[0][jsonData[inArr]];
       createJSON(rep,array);
-      postPHP(json);
     }
     else if(rep === 'gen'){
       postPHP(json);
+      secretMsg(message);
     }
   });
 }
 
+// get the secret message that is used with the password
+$.get('data/msg.txt', function(value){
+  $('#message_area input').val(value);
+  message = value;
+});
 
 // on page load get the json file, fire function calls and set click handlers
 $.getJSON('data/data.json', function(data) {
   json = data;
   if(json[0].signup[0].auth_key !== ""){
-    var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, 'message');
+    var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, message);
     $('#code').text(decrypted);
   }
+
 
 // run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
 $.each(jsonData, function(key,value){
