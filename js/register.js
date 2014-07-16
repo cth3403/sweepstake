@@ -48,18 +48,21 @@ function postPHP(data){
 // checks whether the signup code is valid
 $('#submit').click(function(){
 
-var cipher = $("#auth_key").val();
-var msg = $("#auth_msg").val();
-var decrypted = CryptoJS.AES.decrypt(auth, msg);
-decrypted = decrypted.toString();
+  var cipher = $("#auth_key").val();
+  var msg = $("#auth_msg").val();
 
-    if (decrypted === cipher) {
+  if(cipher && msg !== undefined || ""){
+      var decrypted = CryptoJS.AES.decrypt(auth, msg);
+      decrypted = decrypted.toString();
+    }
+
+  if ((decrypted && cipher !== "" || undefined) && (decrypted === cipher)) {
       $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
       set_auth = $( "input:first" ).val();
       return;
     }
 
-  if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
+  else if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
    value.name = $( "#signup_name" ).val();
    value.email = $( "#signup_email" ).val();
    mkPlayer(value);
@@ -69,12 +72,13 @@ decrypted = decrypted.toString();
    }
    else{
     $('#auth_submit').html('<div class="form-group has-error"><p class="help-block">The submitted code is not valid</p></div>');
-      console.log( "Not valid!" );
+    $('#submit').remove();
+    console.log( "Not valid!" );
     }
 });
 
 // if enter key is pressed after auth_key has been inputted trigger the click function
-$('#auth_key').keypress(function(e) {
+$("input[id^='auth_']").keypress(function(e) {
   if(e.which == 13){
     $('#submit').click();
   }
