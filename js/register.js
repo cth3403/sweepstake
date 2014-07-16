@@ -11,19 +11,6 @@ function mkPlayer(value){
   player = new Player(value.name, value.email);
   //names.push(player);
 }
-// get the player and team JSON file and create separate objects
- $.getJSON('data/data.json', function(data) {
-        json = data;
-       // create the team object from the datafile
-        $.each(data[0].signup, function(key, value) {
-         auth = value.auth_key;
-        });
-
-        // create the player object from the datafile
-        $.each(data[0].players, function(key, value) {
-         // mkPlayer(value);
-        });
- });
 
 // send a sonfirmation email to the user that they have registered
 function confU(email){
@@ -45,41 +32,53 @@ function postPHP(data){
   });
 }
 
-// checks whether the signup code is valid
-$('#submit').click(function(){
+// get the player and team JSON file and create separate objects
+$.getJSON('data/data.json', function(data) {
 
-  var cipher = $("#auth_key").val();
-  var msg = $("#auth_msg").val();
+  if(json[0].teams.length > json[0].players.length){
 
-  if(cipher && msg !== undefined || ""){
-      var decrypted = CryptoJS.AES.decrypt(auth, msg);
-      decrypted = decrypted.toString();
-    }
+    // checks whether the signup code is valid
+    $('#submit').click(function(){
 
-  if ((decrypted && cipher !== "" || undefined) && (decrypted === cipher)) {
-      $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
-      set_auth = $( "input:first" ).val();
-      return;
-    }
+      var cipher = $("#auth_key").val();
+      var msg = $("#auth_msg").val();
 
-  else if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
-   value.name = $( "#signup_name" ).val();
-   value.email = $( "#signup_email" ).val();
-   mkPlayer(value);
-   json[0].players.push(player);
-   postPHP(json);
-   confU(value.email);
-   }
-   else{
-    $('#auth_submit').html('<div class="form-group has-error"><p class="help-block">The submitted code is not valid</p></div>');
-    $('#submit').remove();
-    console.log( "Not valid!" );
-    }
-});
+      if(cipher && msg !== undefined || ""){
+        var decrypted = CryptoJS.AES.decrypt(auth, msg);
+        decrypted = decrypted.toString();
+        $('#auth_submit').html('<p><label for="signup_name">Name:&nbsp;</label><input id="signup_name" type="text" />&nbsp;&nbsp;<label for="signup_email">Email:&nbsp;</label><input id="signup_email" type="text" /></p>');
+        set_auth = $( "input:first" ).val();
+        return;
+      }
 
-// if enter key is pressed after auth_key has been inputted trigger the click function
-$("input[id^='auth_']").keypress(function(e) {
-  if(e.which == 13){
-    $('#submit').click();
+      else if(set_auth !== undefined && $( "#signup_name" ).val() !== (undefined || '' || "")  && $( "#signup_email" ).val() !== (undefined || '' || "") )  {
+        value.name = $( "#signup_name" ).val();
+        value.email = $( "#signup_email" ).val();
+        mkPlayer(value);
+        json[0].players.push(player);
+        postPHP(json);
+        confU(value.email);
+      }
+      else{
+        $('#auth_submit').html('<div class="form-group has-error"><p class="help-block">The submitted code is not valid</p></div>');
+        $('#submit').remove();
+        console.log( "Not valid!" );
+      }
+    });
+
+    // if enter key is pressed after auth_key has been inputted trigger the click function
+    $("input[id^='auth_']").keypress(function(e) {
+      if(e.which == 13){
+        $('#submit').click();
+      }
+    });
+
   }
+  else if(json[0].teams.length === json[0].players.length){
+    $('#result').html('<p>Sorry, the maximum amount of players has been reached.</p>');
+  }
+  else{
+    $('#result').html('<p>Error. Too many users have registered.</p>');
+  }
+
 });
