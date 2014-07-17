@@ -41,8 +41,7 @@ function popTable(id, array){
 }
 
 // function to create JSON - id is the id holding the elements and  array is the array to update
-function createJSON(id,array){
-
+function createJSON(id){
   $.each($('#'+id+' tr'), function(key, value){
    var name = value.cells[0].firstChild;
    var email = value.cells[1].firstChild;
@@ -153,8 +152,8 @@ function buttons(){
     var inArr = jsonData.indexOf(rep);
 
     if(inArr >= 0){
-      var array = json[0][jsonData[inArr]];
-      createJSON(rep,array);
+      createJSON(rep);
+      postPHP(json);
     }
     else if(rep === 'gen'){
       postPHP(json);
@@ -176,7 +175,6 @@ $.getJSON('data/data.json', function(data) {
     var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, message);
     $('#code').text(decrypted);
   }
-
 
 // run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
 $.each(jsonData, function(key,value){
