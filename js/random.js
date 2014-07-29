@@ -43,9 +43,6 @@ function randomArray(r_array, htmlApp){
   }
   else{
 
-  // shuffle the letters of the team and player players to add to the suspense and
-  $('#'+htmlApp).shuffleLetters({"text": item.name});
-
   // add the team info to the Drawn object
   if(htmlApp === 'teams'){
     result = new Drawn(item.name,item.team_id) ;
@@ -58,10 +55,18 @@ function randomArray(r_array, htmlApp){
     result.email = item.email;
   }
 
-  // put them into the result box
-  if(result.team && result.name !== undefined){
+
+
+  // shuffle the letters of the team and player players to add to the suspense and
+  $('#'+htmlApp).shuffleLetters({"text": item.name,"callback": function(){
+  // since players is the second (and last) of the arrays to be called, add the item to the 'drawn' div after it
+  if(htmlApp === 'players'){
     $('#drawn').prepend('<p>'+ result.team+'  '+result.name+'</p>');
   }
+}
+});
+
+  
   // remove the item from the array so it won't be picked up again in the draw
   types[htmlApp] = jQuery.grep(types[htmlApp], function(value) {
     return value !== item;
