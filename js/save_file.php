@@ -7,6 +7,7 @@ $stringData = $_GET["json"];
 fwrite($fh, $stringData);
 echo $stringData;
 fclose($fh);
+print($stringData);
 }
 
 elseif(isset($_GET["msg"])){

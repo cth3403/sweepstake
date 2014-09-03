@@ -1,199 +1,213 @@
 // allow players to register their name and email based on signup codes they were sent
 
-var drawn = [], auth_key, auth, set_auth, json, player, table_data = [], upd=[], jsonData = ['teams','players'], message;
+var drawn = [],
+    auth_key, auth, set_auth, json, player, table_data = [],
+    upd = [],
+    jsonData = ['teams', 'players'],
+    message;
 
-function Team(team_id, name){
-  this.team_id = team_id;
-  this.name = name;
+function Team(team_id, name) {
+    this.team_id = team_id;
+    this.name = name;
 }
 
-function Player(name,email){
-  this.name = name;
-  this.email = email;
+function Player(name, email) {
+    this.name = name;
+    this.email = email;
 }
 
 // function to generate registration code
-function makeid(message)
-{
+function makeid(message) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for( var i=0; i < 6; i++ )
+    for (var i = 0; i < 6; i++)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return CryptoJS.AES.encrypt(text, message);
 }
 
 // function to create table rows based on objects in arrays
-function popTable(id, array){
-    $('#'+id).empty();
-    if(id === "teams"){
-      $.each(array, function(key){
-        $('#'+id).append('<tr id="'+id+'_table_data_'+key+'"><td><input class="name" type="text" value="'+json[0].teams[key].name+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
-      });
+function popTable(id, array) {
+    $('#' + id).empty();
+    if (id === "teams") {
+        $.each(array, function(key) {
+            $('#' + id).append('<tr id="' + id + '_table_data_' + key + '"><td><input class="name" type="text" value="' + json[0].teams[key].name + '"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
+        });
     }
-    if(id === "players"){
-      $.each(array, function(key){
-        $('#'+id).append('<tr id="'+id+'_table_data_'+key+'"><td><input class="name" type="text" value="'+json[0].players[key].name+'"></td><td><input class="email" type="text" value="'+json[0].players[key].email+'"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
-      });
+    if (id === "players") {
+        $.each(array, function(key) {
+            $('#' + id).append('<tr id="' + id + '_table_data_' + key + '"><td><input class="name" type="text" value="' + json[0].players[key].name + '"></td><td><input class="email" type="text" value="' + json[0].players[key].email + '"></td><td><button class="glyphicon glyphicon-minus"></button></td><td><button class="glyphicon glyphicon-plus"></button></td></tr>');
+        });
     }
     buttons();
 
 }
 
 // function to create JSON - id is the id holding the elements and  array is the array to update
-function createJSON(id){
-  $.each($('#'+id+' tr'), function(key, value){
-   var name = value.cells[0].firstChild;
-   var email = value.cells[1].firstChild;
-   var inArr = jsonData.indexOf(id);
+function createJSON(id) {
+    $.each($('#' + id + ' tr'), function(key, value) {
+        var name = value.cells[0].firstChild;
+        var email = value.cells[1].firstChild;
+        var inArr = jsonData.indexOf(id);
 
-   if($(email).hasClass('email')){
-    json[0][jsonData[inArr]][key].email = email.value;
-   }
+        if ($(email).hasClass('email')) {
+            json[0][jsonData[inArr]][key].email = email.value;
+        }
 
-   json[0][jsonData[inArr]][key].name = name.value;
- });
+        json[0][jsonData[inArr]][key].name = name.value;
+        console.log(json[0][jsonData[inArr]][key]);
+    });
+
 }
 
-function secretMsg(message){
-  $.ajax({
-    type: "GET",
-    dataType: 'text',
-    async: false,
-    url: 'js/save_file.php',
-    data: {'msg': message},
-    success: function () {
-      $('#result').text('Secret message and password have been saved.');
-       },
-    failure: function() {alert("Error!");}
-  });
+function secretMsg(message) {
+    $.ajax({
+        type: "GET",
+        dataType: 'text',
+        async: false,
+        url: 'js/save_file.php',
+        data: {
+            'msg': message
+        },
+        success: function() {
+            $('#result').text('Secret message and password have been saved.');
+        },
+        failure: function() {
+            alert("Error!");
+        }
+    });
 }
 
 // function to post data to the json file
-function postPHP(data){
-  console.log(data);
-  $.ajax({
-    type: "GET",
-    dataType : 'json',
-    async: false,
-    url: 'js/save_file.php',
-    data: { 'json': JSON.stringify(data) },
-    success: function () {
-      $('#result').text('Changes have been saved.');
-       },
-    failure: function() {alert("Error!");}
-  });
+function postPHP(data) {
+    console.log(data);
+    $.ajax({
+        type: "GET",
+        dataType: 'json',
+        async: false,
+        url: 'js/save_file.php',
+        data: {
+            'json': JSON.stringify(data)
+        },
+        success: function() {
+            $('#result').text('Changes have been saved.');
+        },
+        failure: function() {
+            alert("Error!");
+        }
+    });
 }
 
 // for some reason the click events were firing twice and to stop this added an  unbind('click') to stop this
-function buttons(){
-  var array, data_id, index, pos, obj, inArr;
+function buttons() {
+    var array, data_id, index, pos, obj, inArr;
 
-  // get details about the button that has been clicked
-  $('.glyphicon:button').unbind('click').click(function(){
-    data_id = $(this).parents('tbody').attr('id');
+    // get details about the button that has been clicked
+    $('.glyphicon:button').unbind('click').click(function() {
+        data_id = $(this).parents('tbody').attr('id');
 
-    // find position of the div id in the jsonData array
-    inArr = jsonData.indexOf(data_id);
+        // find position of the div id in the jsonData array
+        inArr = jsonData.indexOf(data_id);
 
-    // set the array var to the right object
-    array = json[0][jsonData[inArr]];
+        // set the array var to the right object
+        array = json[0][jsonData[inArr]];
 
-    // TODO -- need to get the next team_id and set it as part of the new Team  object
+        // TODO -- need to get the next team_id and set it as part of the new Team  object
 
-    // set the obj var depending on the context
-    switch(jsonData[inArr]){
-      case 'teams':
-      obj = new Team("","");
-      break;
-      case 'players':
-      obj = new  Player("","");
-      break;
-    }
+        // set the obj var depending on the context
+        switch (jsonData[inArr]) {
+            case 'teams':
+                obj = new Team("", "");
+                break;
+            case 'players':
+                obj = new Player("", "");
+                break;
+        }
 
-    var index = $(this).parents('tr').attr('id');
-    index = index.toString().match(/\d+/);
+        var index = $(this).parents('tr').attr('id');
+        index = index.toString().match(/\d+/);
 
-    // add an empty object to the arrays and redraw the tables
-    if($(this).hasClass('glyphicon-plus')){
-      var pos = parseInt(index[0],10)+1;
-      array.splice(pos,0,obj);
-      popTable(data_id, array);
-    }
+        // add an empty object to the arrays and redraw the tables
+        if ($(this).hasClass('glyphicon-plus')) {
+            var pos = parseInt(index[0], 10) + 1;
+            array.splice(pos, 0, obj);
+            popTable(data_id, array);
+        }
 
-    // remove the  object from the array and  remove the row
-    else if($(this).hasClass('glyphicon-minus')){
-      array.splice(index[0],1);
-      $(this).parents('tr').remove();
-    }
+        // remove the  object from the array and  remove the row
+        else if ($(this).hasClass('glyphicon-minus')) {
+            array.splice(index[0], 1);
+            $(this).parents('tr').remove();
+        }
 
-  });
+    });
 
-  // call the makeid function to generate a key
-  $("button:first").unbind('click').click(function() {
-    message = $('#message').val();
-    if(message === undefined || message === ""){
-      $('#message_area').append('<div class="form-group has-error"><p class="help-block">You need to add a message before clicking generate</p></div>');
-    }
-    else{
-    var encrypted = makeid(message);
-    var decrypted = CryptoJS.AES.decrypt(encrypted, message);
-    json[0].signup[0].auth_key = encrypted.toString();
-    $('#code').text(decrypted);
-    }
-  });
+    // call the makeid function to generate a key
+    $("button:first").unbind('click').click(function() {
+        message = $('#message').val();
+        if (message === undefined || message === "") {
+            $('#message_area').append('<div class="form-group has-error"><p class="help-block">You need to add a message before clicking generate</p></div>');
+        } else {
+            var encrypted = makeid(message);
+            var decrypted = CryptoJS.AES.decrypt(encrypted, message);
+            json[0].signup[0].auth_key = encrypted.toString();
+            $('#code').text(decrypted);
+        }
+    });
 
-  // function to update json and save changes
-  $('.save:button').unbind('click').click(function(){
-    // text to ignore from the class of the save button
-    var str = "save btn btn-primary ";
-    var save = $(this).attr('class');
-    var rep = save.replace(str, "");
-    var inArr = jsonData.indexOf(rep);
+    // function to update json and save changes
+    $('.save:button').unbind('click').click(function() {
+        // text to ignore from the class of the save button
+        var str = "save btn btn-primary ";
+        var save = $(this).attr('class');
+        var rep = save.replace(str, "");
+        var inArr = jsonData.indexOf(rep);
 
-    if(inArr >= 0){
-      createJSON(rep);
-      postPHP(json);
-    }
-    else if(rep === 'gen'){
-      postPHP(json);
-      secretMsg(message);
-    }
-  });
+        console.log(inArr);
+
+        if (inArr >= 0) {
+            createJSON(rep);
+            console.log(rep);
+            console.log(json);
+            postPHP(json);
+        } else if (rep === 'gen') {
+            postPHP(json);
+            secretMsg(message);
+        }
+    });
 }
 
 // get the secret message that is used with the password
-$.get('data/msg.txt', function(value){
-  $('#message_area input').val(value);
-  message = value;
+$.get('data/msg.txt', function(value) {
+    $('#message_area input').val(value);
+    message = value;
 });
 
 // on page load get the json file, fire function calls and set click handlers
 $.getJSON('data/data.json', function(data) {
-  json = data;
-  if(json[0].signup[0].auth_key !== ""){
-    var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, message);
-    $('#code').text(decrypted);
-  }
-
-// run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
-$.each(jsonData, function(key,value){
-  popTable(value, json[0][jsonData[key]]);
-
-  // if there is nothing in the array, create a blank input box
-  if(json[0][jsonData[key]].length < 1){
-    var obj;
-    var array = json[0][jsonData[key]];
-    if(value === 'teams'){
-      obj = new Team("","");
+    json = data;
+    if (json[0].signup[0].auth_key !== "") {
+        var decrypted = CryptoJS.AES.decrypt(json[0].signup[0].auth_key, message);
+        $('#code').text(decrypted);
     }
-    else if(value === 'players'){
-      obj = new Player("","");
-    }
-    array.splice(0,1,obj);
-    popTable(value,json[0][jsonData[key]]);
-  }
-});
+
+    // run through an array of values and use these to populate the relevant divs. If no data then create a blank line.
+    $.each(jsonData, function(key, value) {
+        popTable(value, json[0][jsonData[key]]);
+
+        // if there is nothing in the array, create a blank input box
+        if (json[0][jsonData[key]].length < 1) {
+            var obj;
+            var array = json[0][jsonData[key]];
+            if (value === 'teams') {
+                obj = new Team("", "");
+            } else if (value === 'players') {
+                obj = new Player("", "");
+            }
+            array.splice(0, 1, obj);
+            popTable(value, json[0][jsonData[key]]);
+        }
+    });
 
 
 });

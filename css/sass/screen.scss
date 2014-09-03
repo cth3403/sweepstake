@@ -1,0 +1,41 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+@import "base/base.scss";
+@import "compass/reset";
+
+$font-weight-brand : 400;
+$font-size-brand : 2.5em;
+
+$side-cols :2;
+$col-width-side :  15%;
+$gutter : 5%;
+
+html {
+    font-family:  $font-family;
+    font-size: 100%;
+
+}
+
+
+body {
+  background: $background-image-no-svg no-repeat center center fixed;
+
+}
+
+body > .no-svg {
+  background: $background-image-no-svg no-repeat center center fixed;
+}
+
+
+
+.column-center{
+  width: col-width-main(2, 5);
+
+}
+
+.brand{
+    font-weight:  $font-weight-brand;
+    font-size:  $font-size-brand;
+}

@@ -1,0 +1,31 @@
+%clearfix {
+  *zoom: 1;
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+   clear: both;
+  }
+}
+
+@import "_typography.scss";
+
+@import "compass/css3";
+
+
+
+@function col-width-main($side-cols, $gutter){
+	@return
+	$side-cols * $col-width-side
+	+
+	($gutter * 2);
+}
+
+$background-image-svg : url(../img/brazil-background.svg);
+
+$background-image-no-svg : url(../img/brazil-background.jpg);
+
+
+
+
