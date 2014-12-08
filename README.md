@@ -39,7 +39,7 @@ Add/Edit/Delete players from the 'players' array in the json object. If there ar
 Save per change as the save function can't yet handle multiple add/edit/deletes.
 
 ### Assets:
-Background image url: <a href="http://wallhamdu.com/wallpaper-world-cup-brazil-2014-hd.html">http://wallhamdu.com/wallpaper-world-cup-brazil-2014-hd.html</a>
+Background image url: <a href="https://openclipart.org/detail/194133/flag-of-football-by-j4p4n-194133">https://openclipart.org/detail/194133/flag-of-football-by-j4p4n-194133</a>
 
 The ShuffleLetters effect of the radomizer is taken from: <a href="http://tutorialzine.com/2011/09/shuffle-letters-effect-jquery/">http://tutorialzine.com/2011/09/shuffle-letters-effect-jquery/</a>
 
